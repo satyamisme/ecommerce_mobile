@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal, Search } from 'lucide-react';
 import ProductCard from '../components/ui/ProductCard';
-import { mockProducts } from '../data/mockData';
+// import { mockProducts } from '../data/mockData'; // Removed
+import * as mockApiService from '../services/mockApiService'; // Added
 import { Product } from '../types';
+import LoadingSpinner from '../components/ui/LoadingSpinner'; // Added
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true); // Added
+  const [error, setError] = useState<string | null>(null); // Added for error handling
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -18,14 +22,30 @@ export default function ProductsPage() {
   });
   
   useEffect(() => {
+    const fetchAndSetProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const allProducts = await mockApiService.getProducts();
+        setProducts(allProducts);
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+        setError('Failed to load products. Please try again.');
+        setProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAndSetProducts();
+
     // Apply initial brand filter from URL if present
+    // This part can remain as it deals with URL params, not initial data load.
     const brandFromUrl = searchParams.get('brand');
     if (brandFromUrl) {
       setFilters(prev => ({ ...prev, brand: brandFromUrl }));
     }
-    
-    setProducts(mockProducts);
-  }, [searchParams]);
+  }, []); // Removed searchParams from dependency array for initial load
   
   useEffect(() => {
     let result = [...products];
@@ -75,12 +95,14 @@ export default function ProductsPage() {
     setFilteredProducts(result);
     
     // Update URL with brand filter if present
-    if (filters.brand) {
+    // This logic needs to be careful not to cause loops with searchParams dependency
+    const currentBrandInUrl = searchParams.get('brand');
+    if (filters.brand && filters.brand !== currentBrandInUrl) {
       setSearchParams({ brand: filters.brand });
-    } else {
+    } else if (!filters.brand && currentBrandInUrl) {
       setSearchParams({});
     }
-  }, [products, filters, searchQuery, setSearchParams]);
+  }, [products, filters, searchQuery, searchParams, setSearchParams]);
   
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -100,6 +122,28 @@ export default function ProductsPage() {
     setSearchQuery('');
     setSearchParams({});
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
+        <LoadingSpinner size="large" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <p className="text-red-500 mb-4">{error}</p>
+        <button
+          onClick={() => window.location.reload()} // Simpler retry
+          className="btn-primary"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
   
   return (
     <div className="container mx-auto px-4 py-8">

@@ -1,4 +1,4 @@
-import { User, Product } from '../types';
+import { User, Product, Order } from '../types'; // Added Order
 
 export const mockUsers: User[] = [
   {
@@ -16,6 +16,73 @@ export const mockUsers: User[] = [
     role: 'user',
     createdAt: '2023-01-15T00:00:00.000Z',
     avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150',
+  },
+];
+
+export const mockOrders: Order[] = [
+  {
+    id: 'order-1',
+    userId: 'user-2', // Regular User
+    items: [
+      {
+        productId: 'product-1',
+        productName: 'iPhone 15 Pro',
+        quantity: 1,
+        price: 999,
+      },
+      {
+        productId: 'product-3',
+        productName: 'Google Pixel 8 Pro',
+        quantity: 1,
+        price: 899,
+      },
+    ],
+    subtotal: 1898, // 999 + 899
+    tax: 151.84, // 1898 * 0.08
+    shipping: 25,
+    totalAmount: 2074.84, // 1898 + 151.84 + 25
+    status: 'Delivered',
+    createdAt: '2024-03-10T10:00:00.000Z',
+    updatedAt: '2024-03-12T14:30:00.000Z',
+    // shippingAddress: undefined, // Explicitly undefined or leave out if type is optional
+  },
+  {
+    id: 'order-2',
+    userId: 'user-1', // Admin User
+    items: [
+      {
+        productId: 'product-2',
+        productName: 'Samsung Galaxy S24 Ultra',
+        quantity: 1,
+        price: 1199,
+      },
+    ],
+    subtotal: 1199,
+    tax: 95.92, // 1199 * 0.08
+    shipping: 0, // Free shipping
+    totalAmount: 1294.92, // 1199 + 95.92
+    status: 'Shipped',
+    createdAt: '2024-03-15T11:30:00.000Z',
+    updatedAt: '2024-03-16T09:00:00.000Z',
+  },
+  {
+    id: 'order-3',
+    userId: 'user-2', // Regular User
+    items: [
+      {
+        productId: 'product-6',
+        productName: 'iPhone SE (2022)',
+        quantity: 2,
+        price: 429,
+      },
+    ],
+    subtotal: 858, // 429 * 2
+    tax: 68.64, // 858 * 0.08
+    shipping: 10,
+    totalAmount: 936.64, // 858 + 68.64 + 10
+    status: 'Pending',
+    createdAt: '2024-03-17T16:00:00.000Z',
+    updatedAt: '2024-03-17T16:00:00.000Z',
   },
 ];
 
@@ -65,6 +132,8 @@ export const mockProducts: Product[] = [
     model: 'Galaxy S24 Ultra',
     description: 'The ultimate Galaxy phone with a 6.8-inch Dynamic AMOLED display, Snapdragon 8 Gen 3 processor, and a quad camera system.',
     price: 1199,
+    originalPrice: 1199, // Added
+    discount: 0, // Added
     stock: 35,
     image: 'https://images.pexels.com/photos/1092644/pexels-photo-1092644.jpeg?auto=compress&cs=tinysrgb&w=600',
     images: [
@@ -139,6 +208,8 @@ export const mockProducts: Product[] = [
     model: 'OnePlus 12',
     description: 'The OnePlus 12 features a 6.82-inch 2K 120Hz AMOLED display, Snapdragon 8 Gen 3, and Hasselblad camera system.',
     price: 799,
+    originalPrice: 799, // Added
+    discount: 0, // Added
     stock: 40,
     image: 'https://images.pexels.com/photos/607812/pexels-photo-607812.jpeg?auto=compress&cs=tinysrgb&w=600',
     images: [
@@ -175,6 +246,8 @@ export const mockProducts: Product[] = [
     model: 'Xiaomi 14 Ultra',
     description: 'The Xiaomi 14 Ultra features a 6.73-inch 2K 120Hz AMOLED display, Snapdragon 8 Gen 3, and Leica quad camera system.',
     price: 899,
+    originalPrice: 899, // Added
+    discount: 0, // Added
     stock: 30,
     image: 'https://images.pexels.com/photos/1042143/pexels-photo-1042143.jpeg?auto=compress&cs=tinysrgb&w=600',
     images: [
@@ -211,6 +284,8 @@ export const mockProducts: Product[] = [
     model: 'iPhone SE (2022)',
     description: 'The affordable iPhone with a 4.7-inch Retina HD display, A15 Bionic chip, and a classic design with Touch ID.',
     price: 429,
+    originalPrice: 429, // Added
+    discount: 0, // Added
     stock: 60,
     image: 'https://images.pexels.com/photos/114907/pexels-photo-114907.jpeg?auto=compress&cs=tinysrgb&w=600',
     images: [

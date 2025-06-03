@@ -59,20 +59,28 @@ export interface Cart {
   total: number;
 }
 
+// New OrderItem interface
+export interface OrderItem {
+  productId: string;
+  productName: string; // Denormalized for easier display
+  quantity: number;
+  price: number; // Price at the time of order
+}
+
 export interface Order {
   id: string;
   userId: string;
-  items: CartItem[];
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
-  paymentMethod: string;
-  paymentStatus: 'pending' | 'paid' | 'failed';
-  shippingAddress: Address;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  trackingNumber?: string;
-  notes?: string;
+  items: OrderItem[]; // Changed from CartItem[]
+  subtotal: number; // Sum of OrderItem.price * OrderItem.quantity
+  tax: number; // Calculated on subtotal
+  shipping?: number; // Optional shipping cost
+  totalAmount: number; // subtotal + tax + shipping
+  paymentMethod?: string; // Optional
+  paymentStatus?: 'pending' | 'paid' | 'failed'; // Optional
+  shippingAddress?: Address; // Optional, using existing Address type
+  status: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled'; // Simplified status
+  trackingNumber?: string; // Optional
+  notes?: string; // Optional
   createdAt: string;
   updatedAt: string;
 }

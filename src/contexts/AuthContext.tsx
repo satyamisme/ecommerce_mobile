@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types';
-import { mockUsers } from '../data/mockData';
+// import { mockUsers } from '../data/mockData'; // Removed
+import * as mockApiService from '../services/mockApiService'; // Added
 
 interface AuthContextType {
   user: User | null;
@@ -41,11 +42,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // In a real app, this would be an API call
       // Simulating API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // await new Promise(resolve => setTimeout(resolve, 800)); // Delay is in service
       
-      const foundUser = mockUsers.find(u => u.email === email);
+      const foundUser = await mockApiService.getUserByEmail(email);
       
-      if (!foundUser || password !== 'password') { // Simple mock check
+      if (!foundUser || password !== 'password') { // Simple mock check - password check remains here for now
         throw new Error('Invalid email or password');
       }
       
@@ -66,9 +67,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // In a real app, this would be an API call
       // Simulating API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // await new Promise(resolve => setTimeout(resolve, 800)); // Delay is in service
       
-      if (mockUsers.some(u => u.email === email)) {
+      const existingUser = await mockApiService.getUserByEmail(email);
+      if (existingUser) {
         throw new Error('Email already in use');
       }
       
@@ -78,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name,
         role: 'user',
         createdAt: new Date().toISOString(),
+        avatar: 'https://images.pexels.com/photos/1071162/pexels-photo-1071162.jpeg?auto=compress&cs=tinysrgb&w=60', // Added default avatar
       };
       
       // In a real app, we would save this user to the database

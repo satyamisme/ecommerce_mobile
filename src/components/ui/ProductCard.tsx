@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, CheckCircle } from 'lucide-react'; // Added CheckCircle
 import { Product } from '../../types';
 import { useCart } from '../../contexts/CartContext';
+import { useState } from 'react'; // Added useState
 import { motion } from 'framer-motion';
 
 interface ProductCardProps {
@@ -10,11 +11,18 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const [justAdded, setJustAdded] = useState(false);
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (product.stock === 0 || justAdded) return;
+
     addToCart(product, 1);
+    setJustAdded(true);
+    setTimeout(() => {
+      setJustAdded(false);
+    }, 2000); // Revert after 2 seconds
   };
   
   return (
@@ -28,9 +36,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="card group relative flex h-full flex-col overflow-hidden"
       >
         {/* Discount tag */}
-        {product.discount && (
+        {product.discount && product.originalPrice && product.originalPrice > 0 && (
           <div className="absolute left-4 top-4 z-10 rounded-full bg-accent-500 px-2 py-1 text-xs font-bold text-white">
-            -{Math.round((product.discount / product.originalPrice!) * 100)}%
+            -{Math.round((product.discount / product.originalPrice) * 100)}%
           </div>
         )}
         
@@ -61,22 +69,25 @@ export default function ProductCard({ product }: ProductCardProps) {
           
           <div className="mt-auto flex items-center justify-between">
             <div className="flex items-center">
-              {product.originalPrice ? (
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-neutral-900">${product.price}</span>
-                  <span className="text-xs text-neutral-500 line-through">${product.originalPrice}</span>
-                </div>
-              ) : (
-                <span className="text-sm font-bold text-neutral-900">${product.price}</span>
+              <span className="text-sm font-bold text-neutral-900">${product.price}</span>
+              {product.originalPrice && product.originalPrice > product.price && (
+                <span className="ml-2 text-xs text-neutral-500 line-through">
+                  ${product.originalPrice}
+                </span>
               )}
             </div>
             
             <button
               onClick={handleAddToCart}
-              className="rounded-full bg-neutral-100 p-2 text-neutral-700 transition-colors hover:bg-primary-500 hover:text-white"
-              aria-label="Add to cart"
+              disabled={product.stock === 0}
+              className={`rounded-full p-2 transition-colors
+                ${product.stock === 0
+                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-primary-500 hover:text-white'
+                }`}
+              aria-label={product.stock === 0 ? "Out of stock" : justAdded ? "Added to cart" : "Add to cart"}
             >
-              <ShoppingCart className="h-4 w-4" />
+              {justAdded ? <CheckCircle className="h-4 w-4 text-green-500" /> : <ShoppingCart className="h-4 w-4" />}
             </button>
           </div>
         </div>

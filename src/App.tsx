@@ -18,6 +18,8 @@ const AdminDashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
 const AdminProductsPage = lazy(() => import('./pages/admin/ProductsPage'));
 const AdminUsersPage = lazy(() => import('./pages/admin/UsersPage'));
 const AdminOrdersPage = lazy(() => import('./pages/admin/OrdersPage'));
+const AddProductPage = lazy(() => import('./pages/admin/AddProductPage')); // Added
+const EditProductPage = lazy(() => import('./pages/admin/EditProductPage')); // Added
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="/admin/products" element={<AdminProductsPage />} />
+              <Route path="/admin/products/new" element={<AddProductPage />} /> {/* Added */}
+              <Route path="/admin/products/edit/:id" element={<EditProductPage />} /> {/* Added */}
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/orders" element={<AdminOrdersPage />} />
               <Route path="*" element={<NotFoundPage />} />

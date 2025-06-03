@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart, ChevronLeft, Star } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { mockProducts } from '../data/mockData';
+// import { mockProducts } from '../data/mockData'; // Removed
+import * as mockApiService from '../services/mockApiService'; // Added
 import { Product } from '../types';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
@@ -16,22 +17,35 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call
-    const fetchProduct = async () => {
+    const fetchProductDetails = async () => {
+      if (!id) {
+        setLoading(false);
+        setProduct(null); // Or handle as an error state
+        return;
+      }
       setLoading(true);
       try {
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-        const foundProduct = mockProducts.find(p => p.id === id);
+        const foundProduct = await mockApiService.getProductById(id);
         if (foundProduct) {
           setProduct(foundProduct);
-          setSelectedImage(foundProduct.images[0]);
+          // Ensure images array is not empty before accessing index 0
+          if (foundProduct.images && foundProduct.images.length > 0) {
+            setSelectedImage(foundProduct.images[0]);
+          } else if (foundProduct.image) { // Fallback to main image if images array is empty
+            setSelectedImage(foundProduct.image);
+          }
+        } else {
+          setProduct(null); // Product not found
         }
+      } catch (error) {
+        console.error(`Failed to fetch product with id ${id}:`, error);
+        setProduct(null); // Set product to null or handle error state
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
+    fetchProductDetails();
   }, [id]);
 
   const handleAddToCart = () => {
@@ -143,16 +157,30 @@ export default function ProductDetailPage() {
           <div className="space-y-2">
             <div className="flex items-baseline space-x-2">
               <span className="text-3xl font-bold">${product.price}</span>
-              {product.originalPrice && (
+              {product.originalPrice && product.originalPrice > product.price && (
                 <span className="text-lg text-neutral-500 line-through">
                   ${product.originalPrice}
                 </span>
               )}
             </div>
-            {product.discount && (
+            {product.discount && product.discount > 0 && (
               <span className="inline-block rounded-full bg-accent-500 px-2 py-1 text-xs font-semibold text-white">
                 Save ${product.discount}
               </span>
+            )}
+          </div>
+
+          {/* Stock Information */}
+          <div className="my-4">
+            {product.stock > 0 ? (
+              <p className="text-sm text-green-600">
+                Availability: {product.stock} in stock
+                {product.stock < 5 && product.stock > 0 && (
+                  <span className="ml-2 font-semibold text-orange-500">Only {product.stock} left!</span>
+                )}
+              </p>
+            ) : (
+              <p className="text-sm font-semibold text-red-500">Out of Stock</p>
             )}
           </div>
 
@@ -177,10 +205,11 @@ export default function ProductDetailPage() {
             </div>
             <button
               onClick={handleAddToCart}
-              className="btn-primary w-full space-x-2 py-3"
+              className={`btn-primary w-full space-x-2 py-3 ${product.stock === 0 ? 'cursor-not-allowed bg-neutral-400 hover:bg-neutral-400' : ''}`}
+              disabled={product.stock === 0}
             >
               <ShoppingCart className="h-5 w-5" />
-              <span>Add to Cart</span>
+              <span>{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
             </button>
           </div>
 

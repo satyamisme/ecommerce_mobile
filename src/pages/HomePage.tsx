@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, Star, Smartphone, Truck, Shield, CreditCard } from 'lucide-react';
 import ProductCard from '../components/ui/ProductCard';
-import { mockProducts } from '../data/mockData';
+// import { mockProducts } from '../data/mockData'; // Removed
+import * as mockApiService from '../services/mockApiService'; // Added
 import { Product } from '../types';
 
 export default function HomePage() {
@@ -11,15 +12,25 @@ export default function HomePage() {
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
   
   useEffect(() => {
-    // Get featured products
-    const featured = mockProducts.filter(product => product.featured);
-    setFeaturedProducts(featured);
-    
-    // Get latest products
-    const latest = [...mockProducts].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    ).slice(0, 4);
-    setLatestProducts(latest);
+    const fetchProducts = async () => {
+      try {
+        // Get featured products
+        const featured = await mockApiService.getProducts({ featured: true });
+        setFeaturedProducts(featured);
+
+        // Get latest products
+        const allProducts = await mockApiService.getProducts();
+        const latest = [...allProducts].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ).slice(0, 4);
+        setLatestProducts(latest);
+      } catch (error) {
+        console.error("Failed to fetch products for homepage:", error);
+        // Optionally set an error state here to render an error message
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   return (

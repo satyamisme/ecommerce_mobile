@@ -126,6 +126,27 @@ export default function Navbar() {
                       >
                         Admin Dashboard
                       </Link>
+                      <Link
+                        to="/admin/products"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                      >
+                        Manage Products
+                      </Link>
+                      <Link
+                        to="/admin/orders"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                      >
+                        Manage Orders
+                      </Link>
+                      <Link
+                        to="/admin/users"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
+                      >
+                        Manage Users
+                      </Link>
                     )}
                     <button
                       onClick={handleLogout}
@@ -219,6 +240,33 @@ export default function Navbar() {
                     }`}
                   >
                     Admin Dashboard
+                  </Link>
+                  <Link
+                    to="/admin/products"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block rounded-lg px-3 py-2 pl-8 text-base font-medium ${ // Indent slightly
+                      isActive('/admin/products') ? 'bg-primary-50 text-primary-500' : 'text-neutral-700 hover:bg-neutral-50'
+                    }`}
+                  >
+                    Manage Products
+                  </Link>
+                  <Link
+                    to="/admin/orders"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block rounded-lg px-3 py-2 pl-8 text-base font-medium ${ // Indent slightly
+                      isActive('/admin/orders') ? 'bg-primary-50 text-primary-500' : 'text-neutral-700 hover:bg-neutral-50'
+                    }`}
+                  >
+                    Manage Orders
+                  </Link>
+                  <Link
+                    to="/admin/users"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`block rounded-lg px-3 py-2 pl-8 text-base font-medium ${ // Indent slightly
+                      isActive('/admin/users') ? 'bg-primary-50 text-primary-500' : 'text-neutral-700 hover:bg-neutral-50'
+                    }`}
+                  >
+                    Manage Users
                   </Link>
                 )}
                 <button
